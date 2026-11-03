@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server"
-import * as fal from "@fal-ai/serverless-client"
+import { generateImage } from "@/lib/ai-image"
+import { publishImage } from "@/lib/publish-image"
 
-// Configure fal client
-fal.config({
-  credentials: process.env.FAL_KEY,
-})
 
 export async function POST(req: Request) {
   try {
@@ -186,29 +183,8 @@ ${seed ? `Seed: ${seed}` : ""}
 Generate immediately in this exact style with professional quality, accurate branding, and NO ADDED TEXT.`
     }
 
-    const input: any = {
-      prompt,
-      num_images: 1,
-      image_size: "landscape_16_9",
-      num_inference_steps: 4,
-    }
-
-    // Add seed if provided
-    if (seed) {
-      input.seed = seed
-    }
-
-    const imageUrlToUse = seedImageUrl || referenceImageUrl
-    if (imageUrlToUse) {
-      input.image_url = imageUrlToUse
-      input.strength = referenceImageUrl ? 0.35 : 0.5
-    }
-
-    const result = await fal.subscribe("fal-ai/nano-banana", {
-      input,
-    })
-
-    const imageUrl = result.images?.[0]?.url
+    const gen = await generateImage({ prompt, width: 1280, height: 720, seed })
+    const imageUrl = await publishImage(gen.bytes, gen.mediaType)
 
     if (!imageUrl) {
       return NextResponse.json({ error: "No image was generated" }, { status: 500 })

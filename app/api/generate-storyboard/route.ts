@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { generateText } from "ai"
+import { aiText } from "@/lib/ai-text"
 
 export async function POST(req: Request) {
   try {
@@ -80,9 +80,7 @@ MANDATORY VISUAL CONSISTENCY ACROSS ALL 3 SCENES:
 - AUDIO: Often voiceover with music, conversational and relatable tone`,
     }
 
-    const result = await generateText({
-      model: "anthropic/claude-sonnet-4.5",
-      prompt: `Create a storyboard for an 8-second video ad following Google Veo 3.1 best practices.
+    const storyboardPrompt = `Create a storyboard for an 8-second video ad following Google Veo 3.1 best practices.
 
 Product: ${prompt}
 Visual Style: ${style || "cinematic"}
@@ -239,14 +237,15 @@ Return ONLY valid JSON:
       "productIdentity": "EXACT product description - MUST be identical in all 3 scenes"
     }
   ]
-}`,
-    })
+}`
+
+    const text = await aiText(storyboardPrompt, { json: true, maxTokens: 3200 })
 
     let storyboard
     try {
-      storyboard = JSON.parse(result.text)
+      storyboard = JSON.parse(text)
     } catch {
-      const jsonMatch = result.text.match(/\{[\s\S]*\}/)
+      const jsonMatch = text.match(/\{[\s\S]*\}/)
       if (!jsonMatch) {
         throw new Error("No JSON found in AI response")
       }
