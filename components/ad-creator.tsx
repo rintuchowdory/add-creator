@@ -728,7 +728,7 @@ export function AdCreator() {
               className="text-xs md:text-sm text-zinc-400 font-light max-w-2xl mx-auto leading-relaxed pt-3 px-4 md:px-0"
               style={{ fontFamily: "system-ui, sans-serif" }}
             >
-              With Claude Sonnet 4.5 + Nano Banana + Veo 3.1 to create stunning 8-second video ads
+              Flux erzeugt die Keyframes, Groq schreibt die Texte
             </p>
           </div>
 
@@ -818,7 +818,7 @@ export function AdCreator() {
               onClick={() => setShowHowItWorks(true)}
               className="hover:text-white transition-colors duration-200 tracking-wide"
             >
-              how it works
+              so funktioniert's
             </button>
             <span>&middot;</span>
             <a
@@ -866,7 +866,7 @@ export function AdCreator() {
                     AI Creates Your Storyboard
                   </h3>
                   <p className="text-sm leading-relaxed pl-9">
-                    Claude Sonnet 4.5 analyzes your description and generates a professional 3-scene narrative with
+                    Groq analyzes your description and generates a professional 3-scene narrative with
                     precise timing (8 seconds total), camera movements, audio strategy, and scene descriptions optimized
                     for maximum impact.
                   </p>
@@ -879,7 +879,7 @@ export function AdCreator() {
                     Generate Consistent Keyframes
                   </h3>
                   <p className="text-sm leading-relaxed pl-9">
-                    Nano Banana creates 3 high-quality reference images with perfect brand consistency. Each keyframe
+                    Flux creates 3 high-quality reference images with consistent brand look. Each keyframe
                     maintains exact product details, colors, and style across all scenes—you can edit prompts or upload
                     your own images for full control.
                   </p>
@@ -892,7 +892,7 @@ export function AdCreator() {
                     Bring It to Life with Video
                   </h3>
                   <p className="text-sm leading-relaxed pl-9">
-                    Google's Veo 3.1 transforms your storyboard and keyframes into a polished 8-second video with
+                    fal.ai turns your storyboard and keyframes into a polished 8-second video (needs a FAL_KEY) with
                     cinematic camera movements, synchronized sound effects, background music, and smooth scene
                     transitions—all automatically generated.
                   </p>
