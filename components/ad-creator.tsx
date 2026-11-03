@@ -1360,7 +1360,7 @@ export function AdCreator() {
                     Generate Final Video
                   </h3>
                   <p className="text-sm leading-relaxed pl-9">
-                    Google's Veo 3.1 brings everything to life, generating your complete 8-second video with
+                    fal.ai brings everything to life, generating your complete 8-second video with
                     synchronized sound effects, music, and smooth transitions based on your storyboard and reference
                     images.
                   </p>
