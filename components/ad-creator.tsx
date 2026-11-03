@@ -952,8 +952,8 @@ export function AdCreator() {
               </div>
               <p className="text-xs text-zinc-500 text-center">
                 {isGeneratingStoryboard
-                  ? "Claude is creating your storyboard..."
-                  : `Nano Banana is generating ${storyboard?.moments.filter((m) => m.imageUrl).length || 0}/3 images...`}
+                  ? "Groq schreibt das Storyboard..."
+                  : `Flux erzeugt ${storyboard?.moments.filter((m) => m.imageUrl).length || 0}/3 Keyframes...`}
               </p>
             </div>
           )}
@@ -979,7 +979,7 @@ export function AdCreator() {
                         <div className="space-y-2">
                           <div className="h-[3rem] bg-zinc-800/50 animate-pulse rounded-xl" />
                           <p className="text-xs text-zinc-400 text-center font-normal">
-                            Claude is writing Keyframe {index + 1}...
+                            Groq schreibt Keyframe {index + 1}...
                           </p>
                         </div>
                       ) : (
@@ -1006,7 +1006,7 @@ export function AdCreator() {
                           <div className="w-full rounded-2xl aspect-video bg-zinc-900/50 flex flex-col items-center justify-center gap-2 border border-zinc-700/30">
                             <Loader2 className="h-7 w-7 animate-spin text-primary" />
                             <p className="text-xs text-zinc-400 text-center px-4 font-normal">
-                              Nano Banana is generating {index === 0 ? "seed image" : `image ${index + 1}`}...
+                              Flux erzeugt {index === 0 ? "das Referenzbild" : `Keyframe ${index + 1}`}...
                             </p>
                           </div>
                         ) : moment.hasError ? (
@@ -1140,7 +1140,7 @@ export function AdCreator() {
           </a>
           <span>&middot;</span>
           <button onClick={() => setShowHowItWorks(true)} className="hover:text-white transition-colors duration-200">
-            how it works
+            so funktioniert's
           </button>
           <span>&middot;</span>
           <a
@@ -1187,7 +1187,7 @@ export function AdCreator() {
                     AI Creates Your Storyboard
                   </h3>
                   <p className="text-sm leading-relaxed pl-9">
-                    Claude Sonnet 4.5 analyzes your description and generates a professional 3-scene narrative with
+                    Groq analyzes your description and generates a professional 3-scene narrative with
                     precise timing (8 seconds total), camera movements, audio strategy, and scene descriptions optimized
                     for maximum impact.
                   </p>
@@ -1200,7 +1200,7 @@ export function AdCreator() {
                     Generate Consistent Keyframes
                   </h3>
                   <p className="text-sm leading-relaxed pl-9">
-                    Nano Banana creates 3 high-quality reference images with perfect brand consistency. Each keyframe
+                    Flux creates 3 high-quality reference images with consistent product details. Each keyframe
                     maintains exact product details, colors, and style across all scenes—you can edit prompts or upload
                     your own images for full control.
                   </p>
@@ -1213,7 +1213,7 @@ export function AdCreator() {
                     Bring It to Life with Video
                   </h3>
                   <p className="text-sm leading-relaxed pl-9">
-                    Google's Veo 3.1 transforms your storyboard and keyframes into a polished 8-second video with
+                    fal.ai turns your storyboard and keyframes into a polished 8-second video (needs a FAL_KEY) with
                     cinematic camera movements, synchronized sound effects, background music, and smooth scene
                     transitions—all automatically generated.
                   </p>
@@ -1259,7 +1259,7 @@ export function AdCreator() {
                   <div className="relative z-10 flex flex-col items-center space-y-6 md:space-y-8 w-full max-w-md px-6 md:px-8">
                     <div className="w-full space-y-3">
                       <p className="text-lg md:text-xl text-white text-center font-semibold">
-                        Generating video with Veo 3.1...
+                        Video wird erzeugt...
                       </p>
                       <div className="w-full h-2 bg-zinc-700/50 rounded-full overflow-hidden shadow-inner">
                         <div
@@ -1295,7 +1295,7 @@ export function AdCreator() {
           </a>
           <span>&middot;</span>
           <button onClick={() => setShowHowItWorks(true)} className="hover:text-white transition-colors duration-200">
-            how it works
+            so funktioniert's
           </button>
           <span>&middot;</span>
           <a
@@ -1336,7 +1336,7 @@ export function AdCreator() {
                     AI Generates Storyboard
                   </h3>
                   <p className="text-sm leading-relaxed pl-9">
-                    Claude Sonnet 4.5 creates a professional 3-scene narrative structure with precise timing, camera
+                    Groq creates a professional 3-scene narrative structure with precise timing, camera
                     movements, and audio strategy for your 8-second ad.
                   </p>
                 </div>
@@ -1348,7 +1348,7 @@ export function AdCreator() {
                     Create Reference Images
                   </h3>
                   <p className="text-sm leading-relaxed pl-9">
-                    Nano Banana (Google's Gemini 2.5 Flash) generates 3 high-quality keyframe images with consistent
+                    Flux generates 3 high-quality keyframe images with consistent
                     brand identity, maintaining exact product details across all scenes.
                   </p>
                 </div>
