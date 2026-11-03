@@ -22,6 +22,28 @@ export async function aiText(
     return text
   }
 
+  // No local Groq key: use the Cloudflare worker that holds the secret.
+  if (!process.env.DISABLE_WORKER) {
+    try {
+      const { WORKER_BASE } = await import("./ai-image")
+      const res = await fetch(`${WORKER_BASE}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: prompt }],
+          json: opts.json,
+          max_tokens: opts.maxTokens ?? 2600,
+          temperature: opts.temperature ?? 0.8,
+        }),
+      })
+      const json = await res.json()
+      if (res.ok && json?.text) return json.text as string
+      throw new Error(`worker ${res.status}: ${JSON.stringify(json).slice(0, 160)}`)
+    } catch (error) {
+      console.warn("[aiText] worker failed, trying AI gateway:", error)
+    }
+  }
+
   const { generateText } = await import("ai")
   const result = await generateText({ model: process.env.TEXT_MODEL || "openai/gpt-4o-mini", prompt })
   return result.text

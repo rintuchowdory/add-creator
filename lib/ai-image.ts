@@ -1,3 +1,6 @@
+export const WORKER_BASE =
+  process.env.ADD_CREATOR_API || "https://add-creator-api.chowdoryrintu.workers.dev"
+
 export type GeneratedImage = {
   bytes: Uint8Array
   mediaType: string
@@ -6,6 +9,7 @@ export type GeneratedImage = {
 
 export function imageProviders(): string[] {
   const list: string[] = []
+  if (!process.env.DISABLE_WORKER) list.push("worker")
   if (process.env.CLOUDFLARE_ACCOUNT_ID && process.env.CLOUDFLARE_API_TOKEN) list.push("cloudflare")
   if (process.env.FAL_KEY) list.push("fal")
   list.push("pollinations")
@@ -17,6 +21,17 @@ function b64ToBytes(b64: string): Uint8Array {
 }
 
 type GenOpts = { prompt: string; width?: number; height?: number; seed?: number }
+
+async function viaWorker(o: GenOpts): Promise<GeneratedImage> {
+  const res = await fetch(`${WORKER_BASE}/image`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt: o.prompt, width: o.width, height: o.height }),
+  })
+  const json = await res.json()
+  if (!res.ok || !json?.image) throw new Error(`worker ${res.status}: ${JSON.stringify(json).slice(0, 160)}`)
+  return { bytes: b64ToBytes(json.image), mediaType: json.mediaType || "image/jpeg", provider: "cloudflare-worker" }
+}
 
 async function viaCloudflare(o: GenOpts): Promise<GeneratedImage> {
   const account = process.env.CLOUDFLARE_ACCOUNT_ID
@@ -70,6 +85,7 @@ export async function generateImage(o: GenOpts): Promise<GeneratedImage> {
   const errors: string[] = []
   for (const provider of imageProviders()) {
     try {
+      if (provider === "worker") return await viaWorker(o)
       if (provider === "cloudflare") return await viaCloudflare(o)
       if (provider === "fal") return await viaFal(o)
       if (provider === "pollinations") return await viaPollinations(o)
