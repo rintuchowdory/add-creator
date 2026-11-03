@@ -3,6 +3,8 @@ import { generateImage } from "@/lib/ai-image"
 import { publishImage } from "@/lib/publish-image"
 
 
+export const maxDuration = 60
+
 export async function POST(req: Request) {
   try {
     const { description, seedImageUrl, referenceImageUrl, productDescription, style, productIdentity, seed, aspectRatio } =
@@ -191,7 +193,9 @@ Generate immediately in this exact style with professional quality, accurate bra
       "1.91:1": { width: 1200, height: 628 },
     }
     const size = SIZES[aspectRatio as string] ?? SIZES["16:9"]
-    const gen = await generateImage({ prompt, width: size.width, height: size.height, seed })
+    // flux-1-schnell rejects anything over 2048 chars
+    const safePrompt = prompt.length > 2000 ? prompt.slice(0, 2000) : prompt
+    const gen = await generateImage({ prompt: safePrompt, width: size.width, height: size.height, seed })
     const imageUrl = await publishImage(gen.bytes, gen.mediaType)
 
     if (!imageUrl) {

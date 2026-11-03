@@ -412,12 +412,9 @@ export function AdCreator() {
       // Generate Opening Hook first - this becomes our visual reference
       const openingHookImage = await handleGenerateMomentImage(0, null, activeStoryboard)
 
-      if (!openingHookImage) {
-        setIsGeneratingImages(false)
-        return
+      if (openingHookImage) {
+        setSeedImageUrl(openingHookImage)
       }
-
-      setSeedImageUrl(openingHookImage)
 
       // Generate a master seed for consistency
       const generatedSeed = `brand-consistency-${Date.now()}`
@@ -425,18 +422,12 @@ export function AdCreator() {
 
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      // Generate Product Showcase using Opening Hook as reference
+      // A failed card must not stop the remaining ones
       const productShowcaseImage = await handleGenerateMomentImage(1, openingHookImage, activeStoryboard)
-
-      if (!productShowcaseImage) {
-        setIsGeneratingImages(false)
-        return
-      }
 
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      // Generate Closing Message using Product Showcase as reference
-      await handleGenerateMomentImage(2, productShowcaseImage, activeStoryboard)
+      await handleGenerateMomentImage(2, productShowcaseImage || openingHookImage, activeStoryboard)
     } catch (error) {
       console.error("Error in automatic generation:", error)
     } finally {

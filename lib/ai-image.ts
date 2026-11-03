@@ -1,3 +1,6 @@
+/** Workers AI rejects prompts longer than 2048 chars; pollinations chokes on long URLs. */
+const cap = (text: string, limit: number) => (text.length > limit ? text.slice(0, limit) : text)
+
 export const WORKER_BASE =
   process.env.ADD_CREATOR_API || "https://add-creator-api.chowdoryrintu.workers.dev"
 
@@ -26,7 +29,7 @@ async function viaWorker(o: GenOpts): Promise<GeneratedImage> {
   const res = await fetch(`${WORKER_BASE}/image`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: o.prompt, width: o.width, height: o.height }),
+    body: JSON.stringify({ prompt: cap(o.prompt, 2000), width: o.width, height: o.height }),
   })
   const json = await res.json()
   if (!res.ok || !json?.image) throw new Error(`worker ${res.status}: ${JSON.stringify(json).slice(0, 160)}`)
@@ -69,7 +72,7 @@ async function viaFal(o: GenOpts): Promise<GeneratedImage> {
 async function viaPollinations(o: GenOpts): Promise<GeneratedImage> {
   const seed = o.seed ?? Math.floor(Math.random() * 1_000_000)
   const url =
-    `https://image.pollinations.ai/prompt/${encodeURIComponent(o.prompt)}` +
+    `https://image.pollinations.ai/prompt/${encodeURIComponent(cap(o.prompt, 600))}` +
     `?width=${o.width ?? 1024}&height=${o.height ?? 1024}&model=flux&nologo=true&seed=${seed}`
   const res = await fetch(url, { headers: { accept: "image/jpeg" } })
   if (!res.ok) throw new Error(`pollinations ${res.status}`)

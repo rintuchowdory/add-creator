@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { aiText } from "@/lib/ai-text"
 
+export const maxDuration = 60
+
 export async function POST(req: Request) {
   try {
     const { prompt, style, referenceImageUrl } = await req.json()
