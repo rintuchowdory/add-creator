@@ -8,7 +8,9 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     image: { active: providers[0], chain: providers },
-    text: { provider: process.env.GROQ_API_KEY ? "groq" : "vercel-ai-gateway" },
+    text: {
+      provider: process.env.GROQ_API_KEY ? "groq" : process.env.DISABLE_WORKER ? "vercel-ai-gateway" : "cloudflare-worker (groq)",
+    },
     storage: process.env.BLOB_READ_WRITE_TOKEN ? "vercel-blob" : "inline-data-url",
     timestamp: new Date().toISOString(),
   })
