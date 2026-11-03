@@ -8,6 +8,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Loader2, RefreshCw, AlertCircle, X } from "lucide-react"
+import { BrandKitPanel } from "@/components/brand-kit"
+import { CopyStudio } from "@/components/copy-studio"
+import { brandBriefing, loadBrand, saveBrand, type Brand } from "@/lib/brand"
+import { cropToRatio, RATIOS } from "@/lib/crop"
 
 interface Moment {
   timing: string
@@ -38,6 +42,8 @@ export function AdCreator() {
   const [step, setStep] = useState<Step>("input")
   const [prompt, setPrompt] = useState("")
   const [selectedStyle, setSelectedStyle] = useState<string>("")
+  const [brand, setBrand] = useState<Brand>({ name: "", audience: "", tone: "", colors: "", usp: "" })
+  const [aspectRatio, setAspectRatio] = useState<string>("1:1")
   const [storyboard, setStoryboard] = useState<Storyboard | null>(null)
   const [isGeneratingStoryboard, setIsGeneratingStoryboard] = useState(false)
   const [isGeneratingImages, setIsGeneratingImages] = useState(false)
@@ -193,6 +199,25 @@ export function AdCreator() {
     }, 500)
   }
 
+  useEffect(() => {
+    setBrand(loadBrand())
+  }, [])
+
+  const updateBrand = (next: Brand) => {
+    setBrand(next)
+    saveBrand(next)
+  }
+
+  const promptWithBrand = () => [prompt, brandBriefing(brand)].filter(Boolean).join("\n\n")
+
+  const applyRatio = async (data: any) => {
+    if (data?.imageUrl && aspectRatio !== "1:1") {
+      const ratio = RATIOS.find((r) => r.value === aspectRatio)?.ratio ?? 1
+      data.imageUrl = await cropToRatio(data.imageUrl, ratio)
+    }
+    return data
+  }
+
   const handleGenerateStoryboard = async () => {
     if (!prompt.trim() || !selectedStyle) return
 
@@ -245,12 +270,12 @@ export function AdCreator() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt,
+          prompt: promptWithBrand(),
           style: selectedStyle,
         }),
       })
 
-      const data = await response.json()
+      const data = await applyRatio(await response.json())
       setStoryboard(data)
 
       handleGenerateAllImages(data)
@@ -284,7 +309,7 @@ export function AdCreator() {
         }),
       })
 
-      const data = await response.json()
+      const data = await applyRatio(await response.json())
       const newMoment = data.moments[index]
 
       setStoryboard((prevStoryboard) => {
@@ -331,8 +356,9 @@ export function AdCreator() {
         body: JSON.stringify({
           description: activeStoryboard.moments[index].customPrompt || activeStoryboard.moments[index].description,
           seedImageUrl: seedImage,
-          productDescription: prompt,
+          productDescription: promptWithBrand(),
           style: selectedStyle,
+          aspectRatio,
           productIdentity: activeStoryboard.productIdentity || activeStoryboard.moments[index].productIdentity,
           seed: masterSeed,
         }),
@@ -343,7 +369,7 @@ export function AdCreator() {
         throw new Error(errorData.error || "Failed to generate image")
       }
 
-      const data = await response.json()
+      const data = await applyRatio(await response.json())
 
       setStoryboard((prevStoryboard) => {
         if (!prevStoryboard) return null
@@ -547,8 +573,9 @@ export function AdCreator() {
         body: JSON.stringify({
           description,
           seedImageUrl: seedImage,
-          productDescription: prompt,
+          productDescription: promptWithBrand(),
           style: selectedStyle,
+          aspectRatio,
           productIdentity: storyboard.productIdentity || moment.productIdentity,
           seed: masterSeed,
         }),
@@ -559,7 +586,7 @@ export function AdCreator() {
         throw new Error(errorData.error || "Failed to generate image")
       }
 
-      const data = await response.json()
+      const data = await applyRatio(await response.json())
 
       setStoryboard((prevStoryboard) => {
         if (!prevStoryboard) return null
@@ -633,7 +660,7 @@ export function AdCreator() {
         throw new Error(errorData.error || "Failed to upload image")
       }
 
-      const data = await response.json()
+      const data = await applyRatio(await response.json())
 
       setStoryboard((prevStoryboard) => {
         if (!prevStoryboard) return null
@@ -720,6 +747,14 @@ export function AdCreator() {
               <p className="text-xs text-zinc-400 text-right font-light tracking-wide">Press ⌘+Enter to generate</p>
             </div>
 
+            <BrandKitPanel brand={brand} onChange={updateBrand} />
+
+            <CopyStudio
+              product={prompt}
+              brand={brand}
+              onUseInPrompt={(text) => setPrompt((prev) => (prev.includes(text) ? prev : `${prev}\n\n${text}`.trim()))}
+            />
+
             <div className="space-y-3">
               <p className="text-xs md:text-sm text-zinc-300 font-semibold tracking-wide uppercase">Select Style</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
@@ -734,6 +769,25 @@ export function AdCreator() {
                     }`}
                   >
                     <div className="font-bold text-xs md:text-sm tracking-wide leading-tight">{style.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-xs md:text-sm text-zinc-300 font-semibold tracking-wide uppercase">Format</p>
+              <div className="flex flex-wrap gap-2">
+                {RATIOS.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setAspectRatio(option.value)}
+                    className={`px-3 md:px-4 py-2 text-xs md:text-sm rounded-2xl border-2 transition-all duration-300 ${
+                      aspectRatio === option.value
+                        ? "text-white bg-[#0071e3] border-[#0071e3] shadow-md shadow-[#0071e3]/20"
+                        : "text-zinc-300 bg-zinc-900/50 border-zinc-700/50 hover:text-white hover:border-zinc-600"
+                    }`}
+                  >
+                    {option.label}
                   </button>
                 ))}
               </div>

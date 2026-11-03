@@ -5,7 +5,7 @@ import { publishImage } from "@/lib/publish-image"
 
 export async function POST(req: Request) {
   try {
-    const { description, seedImageUrl, referenceImageUrl, productDescription, style, productIdentity, seed } =
+    const { description, seedImageUrl, referenceImageUrl, productDescription, style, productIdentity, seed, aspectRatio } =
       await req.json()
 
     if (!description) {
@@ -183,7 +183,15 @@ ${seed ? `Seed: ${seed}` : ""}
 Generate immediately in this exact style with professional quality, accurate branding, and NO ADDED TEXT.`
     }
 
-    const gen = await generateImage({ prompt, width: 1280, height: 720, seed })
+    const SIZES: Record<string, { width: number; height: number }> = {
+      "1:1": { width: 1024, height: 1024 },
+      "4:5": { width: 896, height: 1120 },
+      "9:16": { width: 768, height: 1344 },
+      "16:9": { width: 1344, height: 768 },
+      "1.91:1": { width: 1200, height: 628 },
+    }
+    const size = SIZES[aspectRatio as string] ?? SIZES["16:9"]
+    const gen = await generateImage({ prompt, width: size.width, height: size.height, seed })
     const imageUrl = await publishImage(gen.bytes, gen.mediaType)
 
     if (!imageUrl) {
